@@ -90,7 +90,7 @@
                 audio: true
             }).then(function (stream) {
 
-                mediaStreamTrack = typeof stream.stop === 'function' ? stream : stream.getTracks()[1];
+                // mediaStreamTrack = typeof stream.stop === 'function' ? stream : stream.getTracks()[1];
 
                 video.src = (window.URL || window.webkitURL).createObjectURL(stream);
 
@@ -104,68 +104,68 @@
 
         }
 
-        // 使用旧方法打开摄像头
-        else if (navigator.getMedia) {
+        // // 使用旧方法打开摄像头
+        // else if (navigator.getMedia) {
 
-            navigator.getMedia({
+        //     navigator.getMedia({
 
-                video: true
+        //         video: true
 
-            }, function (stream) {
+        //     }, function (stream) {
 
-                mediaStreamTrack = stream.getTracks();
+        //         mediaStreamTrack = stream.getTracks();
 
-                video.src = (window.URL || window.webkitURL).createObjectURL(stream);
+        //         video.src = (window.URL || window.webkitURL).createObjectURL(stream);
 
-                video.play();
+        //         video.play();
 
-            }, function (err) {
+        //     }, function (err) {
 
-                console.log(err);
+        //         console.log(err);
 
-            });
+        //     });
 
-        }
+        // }
 
-        // 截取图像
-        var vactive = true;
-        snap.click(function () {
-            if (vactive) {
-                context.drawImage(video, 0, 0, video.width, video.height);
-                $(video).hide();
-                snap.text("返回");
-                mediaStreamTrack && mediaStreamTrack.stop();//关闭摄像头
-            }else{
-                canvas.hide();
-                mediaStreamTrack && mediaStreamTrack.satart();//打开摄像头
-                $(video).show();
-                snap.text("获取图片");
-            }
-        });
+        // // 截取图像
+        // var vactive = true;
+        // snap.click(function () {
+        //     if (vactive) {
+        //         context.drawImage(video, 0, 0, video.width, video.height);
+        //         $(video).hide();
+        //         snap.text("返回");
+        //         mediaStreamTrack && mediaStreamTrack.stop();//关闭摄像头
+        //     }else{
+        //         canvas.hide();
+        //         mediaStreamTrack && mediaStreamTrack.start();//打开摄像头
+        //         $(video).show();
+        //         snap.text("获取图片");
+        //     }
+        // });
 
 
-        // 上传截取的图像
-        upload.click(function () {
+        // // 上传截取的图像
+        // upload.click(function () {
 
-            jQuery.post('/uploadSnap.php', {
+        //     jQuery.post('/uploadSnap.php', {
 
-                snapData: canvas.toDataURL('image/png')
+        //         snapData: canvas.toDataURL('image/png')
 
-            }).done(function (rs) {
+        //     }).done(function (rs) {
 
-                rs = JSON.parse(rs);
+        //         rs = JSON.parse(rs);
 
-                console.log(rs);
+        //         console.log(rs);
 
-                uploaded.src = rs.path;
+        //         uploaded.src = rs.path;
 
-            }).fail(function (err) {
+        //     }).fail(function (err) {
 
-                console.log(err);
+        //         console.log(err);
 
-            });
+        //     });
 
-        });
+        // });
     </script>
 
 </body>
