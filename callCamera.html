@@ -1,171 +1,114 @@
 <!DOCTYPE html>
+
 <html>
 
+
+
 <head>
+
     <meta charset="UTF-8">
-<!--     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />   -->
-    <title>callCamera Demo</title>
-    <style>
-        html,body{
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        width: 100%;
-    }
-    .full{
-        height: 100%;
-        width: 100%;
-    }
-    #canvas{
-        display: none;
-    }
-    .btn{
-        position: absolute;
-        bottom:10px;
-        width: 100%;
-        text-align: center;
-    }
-    </style>
+
+    <title></title>
+
 </head>
 
 <body>
-    <div class="full">
-            <video id="video" height="200px" ></video>
 
-            <canvas id="canvas" class="full"></canvas>
-        
-            <div class="btn">
-        
-                <button id="snap">截取图像</button>
-        
-                <button id="upload">上传图像</button>
-        
-            </div>
-    </div>
-   
+    <video id="video" width="400" height="300" style="border:1px solid red;"></video>
 
+    <canvas id="canvas" width="400" height="300" style="border:1px solid red;"></canvas>
+
+    <p>
+
+        <button id="snap">截取图像</button>
+
+        <button id="close">关闭摄像头</button>
+
+        <button id="upload">上传图像</button>
+
+    </p>
+
+    <img id="uploaded" width="400" height="300" />
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <script type="text/javascript">
         // function $(elem) {
-
         //     return document.querySelector(elem);
-
         // }
-
         // 获取媒体方法（旧方法）
-
         // 8     navigator.getMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMeddia || navigator.msGetUserMedia;
-
-        var canvas = $('#canvas'),
-
-            context = canvas[0].getContext('2d'),
-
+        var canvas = $('#canvas')[0],
+            context = canvas.getContext('2d'),
             video = $('#video')[0],
-
-            snap = $('#snap'),
-
-            upload = $('#upload'),
-
-            uploaded = $('#uploaded'),
-
+            snap = $('#snap')[0],
+            close = $('#close')[0],
+            upload = $('#upload')[0],
+            uploaded = $('#uploaded')[0],
             mediaStreamTrack;
-
-
-
-
+       var exArray = []; //存储设备源ID  
+        if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+            navigator.mediaDevices.enumerateDevices()
+                .then(function (sources) {
+                    for (var i = 0; i != sources.length; ++i) {
+                        var sourceInfo = sources[i];
+                        //这里会遍历audio,video，所以要加以区分  
+                        if (sourceInfo.kind === 'videoinput') {
+                            exArray.push(sourceInfo.deviceId);
+                        }
+                    }
+                })
+        }
         // 获取媒体方法（新方法）
-
         // 使用新方法打开摄像头
-
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-
-            navigator.mediaDevices.getUserMedia({
+             navigator.mediaDevices.getUserMedia({
                 video: {
                     width: 1280,
                     height: 720,
-                    facingMode: "environment" //后置摄像头，前置为“user”
+                    facingMode:"environment" //后置摄像头，前置为“user”
                 },
                 audio: true
             }).then(function (stream) {
-
-                // mediaStreamTrack = typeof stream.stop === 'function' ? stream : stream.getTracks()[1];
-
+                mediaStreamTrack = typeof stream.stop === 'function' ? stream : stream.getTracks()[1];
                 video.src = (window.URL || window.webkitURL).createObjectURL(stream);
-
                 video.play();
-
             }).catch(function (err) {
-
                 console.log(err);
-
             })
-
         }
-
-        // // 使用旧方法打开摄像头
-        // else if (navigator.getMedia) {
-
-        //     navigator.getMedia({
-
-        //         video: true
-
-        //     }, function (stream) {
-
-        //         mediaStreamTrack = stream.getTracks();
-
-        //         video.src = (window.URL || window.webkitURL).createObjectURL(stream);
-
-        //         video.play();
-
-        //     }, function (err) {
-
-        //         console.log(err);
-
-        //     });
-
-        // }
-
-        // // 截取图像
-        // var vactive = true;
-        // snap.click(function () {
-        //     if (vactive) {
-        //         context.drawImage(video, 0, 0, video.width, video.height);
-        //         $(video).hide();
-        //         snap.text("返回");
-        //         mediaStreamTrack && mediaStreamTrack.stop();//关闭摄像头
-        //     }else{
-        //         canvas.hide();
-        //         mediaStreamTrack && mediaStreamTrack.start();//打开摄像头
-        //         $(video).show();
-        //         snap.text("获取图片");
-        //     }
-        // });
-
-
-        // // 上传截取的图像
-        // upload.click(function () {
-
-        //     jQuery.post('/uploadSnap.php', {
-
-        //         snapData: canvas.toDataURL('image/png')
-
-        //     }).done(function (rs) {
-
-        //         rs = JSON.parse(rs);
-
-        //         console.log(rs);
-
-        //         uploaded.src = rs.path;
-
-        //     }).fail(function (err) {
-
-        //         console.log(err);
-
-        //     });
-
-        // });
+        // 使用旧方法打开摄像头
+        else if (navigator.getMedia) {
+            navigator.getMedia({
+                video: true
+            }, function (stream) {
+                mediaStreamTrack = stream.getTracks()[0];
+                video.src = (window.URL || window.webkitURL).createObjectURL(stream);
+                video.play();
+            }, function (err) {
+                console.log(err);
+            });
+        }
+        // 截取图像
+        snap.addEventListener('click', function () {
+            context.drawImage(video, 0, 0, 400, 300);
+        }, false);
+        // 关闭摄像头
+        close.addEventListener('click', function () {
+            mediaStreamTrack && mediaStreamTrack.stop();
+        }, false);
+        // 上传截取的图像
+        upload.addEventListener('click', function () {
+            jQuery.post('/uploadSnap.php', {
+                snapData: canvas.toDataURL('image/png')
+            }).done(function (rs) {
+                rs = JSON.parse(rs);
+                console.log(rs);
+                uploaded.src = rs.path;
+            }).fail(function (err) {
+                console.log(err);
+            });
+        }, false);
     </script>
 
 </body>
