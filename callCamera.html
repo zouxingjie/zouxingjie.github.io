@@ -67,10 +67,9 @@
                 .then(function (sources) {
                     for (var i = 0; i != sources.length; ++i) {
                         var sourceInfo = sources[i];
-                        alert(JSON.stringify(sourceInfo));
                         //这里会遍历audio,video，所以要加以区分  
-                        if (sourceInfo.kind === 'video') {
-                            exArray.push(sourceInfo.id);
+                        if (sourceInfo.kind === 'videoinput') {
+                            exArray.push(sourceInfo.deviceId);
                         }
                     }
                 })
