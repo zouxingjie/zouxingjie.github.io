@@ -77,7 +77,7 @@
 
                 console.log(stream);
 
-                mediaStreamTrack = typeof stream.stop === 'function' ? stream : stream.getTracks()[1];
+                mediaStreamTrack = typeof stream.stop === 'function' ? stream : stream.getTracks()[0];
 
                 video.src = (window.URL || window.webkitURL).createObjectURL(stream);
 
