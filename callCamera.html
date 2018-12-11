@@ -87,7 +87,7 @@
                     height: 720,
                     facingMode:"environment" //后置摄像头，前置为“user”
                 },
-                'audio': true
+                audio: true
             }).then(function (stream) {
 
                 mediaStreamTrack = typeof stream.stop === 'function' ? stream : stream.getTracks()[1];
