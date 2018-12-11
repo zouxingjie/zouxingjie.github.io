@@ -81,19 +81,11 @@
 
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
 
-            navigator.mediaDevices.getUserMedia({
+             navigator.mediaDevices.getUserMedia({
                 video: {
-                    mandatory: {
-                        minAspectRatio: 1.40,
-                        maxAspectRatio: 1.78,
-                        minFrameRate: 15,
-                        maxFrameRate: 25,
-                        minWidth: 1280,
-                        minHeight: 720
-                    },
-                    optional: [{
-                        sourceId: exArray[1] //0为前置摄像头，1为后置
-                    }]
+                    width: 1280,
+                    height: 720,
+                    facingMode:"environment" //后置摄像头，前置为“user”
                 },
                 'audio': true
             }).then(function (stream) {
