@@ -61,16 +61,19 @@
 
 
 
-        var exArray = []; //存储设备源ID  
-        MediaStreamTrack.getSources(function (sourceInfos) {
-            for (var i = 0; i != sourceInfos.length; ++i) {
-                var sourceInfo = sourceInfos[i];
-                //这里会遍历audio,video，所以要加以区分  
-                if (sourceInfo.kind === 'video') {
-                    exArray.push(sourceInfo.id);
-                }
-            }
-        });
+       var exArray = []; //存储设备源ID  
+        if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+            navigator.mediaDevices.enumerateDevices()
+                .then(function (sources) {
+                    for (var i = 0; i != sources.length; ++i) {
+                        var sourceInfo = sources[i];
+                        //这里会遍历audio,video，所以要加以区分  
+                        if (sourceInfo.kind === 'video') {
+                            exArray.push(sourceInfo.id);
+                        }
+                    }
+                })
+        }
 
         // 获取媒体方法（新方法）
 
