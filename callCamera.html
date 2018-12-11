@@ -72,6 +72,7 @@
                 audio: true
 
             }).then(function (stream) {
+                alert(stream.getTracks().length()+"   1");
 
                 console.log(stream);
 
@@ -97,6 +98,7 @@
                 video: true
 
             }, function (stream) {
+                alert(stream.getTracks().length()+"   0");
 
                 mediaStreamTrack = stream.getTracks()[0];
 
@@ -118,7 +120,7 @@
 
         snap.addEventListener('click', function () {
 
-            context.drawImage(video, 0, 0, 200, 150);
+            context.drawImage(video, 0, 0, 400, 300);
 
         }, false);
 
