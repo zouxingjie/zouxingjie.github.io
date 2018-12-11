@@ -62,7 +62,7 @@
 
             context = canvas[0].getContext('2d'),
 
-            video = $('#video'),
+            video = $('#video')[0],
 
             snap = $('#snap'),
 
@@ -132,13 +132,13 @@
         snap.click(function () {
             if (vactive) {
                 context.drawImage(video, 0, 0, video.width, video.height);
-                video.hide();
+                $(video).hide();
                 snap.text("返回");
                 mediaStreamTrack && mediaStreamTrack.stop();//关闭摄像头
             }else{
                 canvas.hide();
                 mediaStreamTrack && mediaStreamTrack.satart();//打开摄像头
-                video.show();
+                $(video).show();
                 snap.text("获取图片");
             }
         });
