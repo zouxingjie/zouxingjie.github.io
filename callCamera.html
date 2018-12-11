@@ -1,34 +1,48 @@
 <!DOCTYPE html>
-
 <html>
 
-
-
 <head>
-
     <meta charset="UTF-8">
-
-    <title></title>
-
+    <title>callCamera Demo</title>
+    <style>
+        html,body{
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+    }
+    .full{
+        height: 100%;
+        width: 100%;
+    }
+    #canvas{
+        display: none;
+    }
+    .btn{
+        position: absolute;
+        bottom:10px;
+        width: 100%;
+        text-align: center;
+    }
+    </style>
 </head>
 
 <body>
+    <div class="full">
+            <video id="video" class="full"></video>
 
-    <video id="video" width="400" height="300" style="border:1px solid red;"></video>
+            <canvas id="canvas" class="full"></canvas>
+        
+            <div class="btn">
+        
+                <button id="snap">截取图像</button>
+        
+                <button id="upload">上传图像</button>
+        
+            </div>
+    </div>
+   
 
-    <canvas id="canvas" width="400" height="300" style="border:1px solid red;"></canvas>
-
-    <p>
-
-        <button id="snap">截取图像</button>
-
-        <button id="close">关闭摄像头</button>
-
-        <button id="upload">上传图像</button>
-
-    </p>
-
-    <img id="uploaded" width="400" height="300" />
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
@@ -43,19 +57,17 @@
 
         // 8     navigator.getMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMeddia || navigator.msGetUserMedia;
 
-        var canvas = $('#canvas')[0],
+        var canvas = $('#canvas'),
 
-            context = canvas.getContext('2d'),
+            context = canvas[0].getContext('2d'),
 
-            video = $('#video')[0],
+            video = $('#video'),
 
-            snap = $('#snap')[0],
+            snap = $('#snap'),
 
-            close = $('#close')[0],
+            upload = $('#upload'),
 
-            upload = $('#upload')[0],
-
-            uploaded = $('#uploaded')[0],
+            uploaded = $('#uploaded'),
 
             mediaStreamTrack;
 
@@ -72,7 +84,7 @@
                 video: {
                     width: 1280,
                     height: 720,
-                    facingMode:"environment" //后置摄像头，前置为“user”
+                    facingMode: "environment" //后置摄像头，前置为“user”
                 },
                 audio: true
             }).then(function (stream) {
@@ -100,7 +112,7 @@
 
             }, function (stream) {
 
-                mediaStreamTrack = stream.getTracks()[0];
+                mediaStreamTrack = stream.getTracks();
 
                 video.src = (window.URL || window.webkitURL).createObjectURL(stream);
 
@@ -115,24 +127,24 @@
         }
 
         // 截取图像
+        var vactive = true;
+        snap.click(function () {
+            if (vactive) {
+                context.drawImage(video, 0, 0, video.width, video.height);
+                video.hide();
+                snap.text("返回");
+                mediaStreamTrack && mediaStreamTrack.stop();//关闭摄像头
+            }else{
+                canvas.hide();
+                mediaStreamTrack && mediaStreamTrack.satart();//打开摄像头
+                video.show();
+                snap.text("获取图片");
+            }
+        });
 
-        snap.addEventListener('click', function () {
-
-            context.drawImage(video, 0, 0, video.width, video.height);
-
-        }, false);
-
-        // 关闭摄像头
-
-        close.addEventListener('click', function () {
-
-            mediaStreamTrack && mediaStreamTrack.stop();
-
-        }, false);
 
         // 上传截取的图像
-
-        upload.addEventListener('click', function () {
+        upload.click(function () {
 
             jQuery.post('/uploadSnap.php', {
 
@@ -152,7 +164,7 @@
 
             });
 
-        }, false);
+        });
     </script>
 
 </body>
