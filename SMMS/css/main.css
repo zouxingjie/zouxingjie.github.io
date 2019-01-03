@@ -1,0 +1,27 @@
+.dataTables_length {
+    width: auto;
+    padding-top: 3px;
+    float: left;
+}
+.dataTables_info {
+    width: auto;
+    margin-left: 20px;
+    float: left;
+}
+
+.nav-md .main_container .right_col{
+    margin-bottom: 49px;
+}
+
+.table a{
+    font-weight: bold;
+    color: #5e9de0;
+}
+
+#photoModal .modal-body a>img{
+    margin: 5px;
+}
+
+.table-btn{
+    margin-right: 10px !important;
+}
