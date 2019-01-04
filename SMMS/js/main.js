@@ -2796,43 +2796,56 @@ function init_DataTables() {
 					dataSrc: ""
 				},
 				columns: [{
+					name: 'checkBox',
 						data: null
 					},
 					{
+						name: 'SLOPE_NO',
 						data: 'SLOPE_NO'
 					},
 					{
-						data: 'MAP'
+					name: 'MAP',
+					data: 'MAP'
 					},
 					{
-						data: 'PHOTO'
+					name: 'PHOTO',
+					data: 'PHOTO'
 					},
 					{
-						data: 'COMB_TYPE'
+					name: 'COMB_TYPE',
+					data: 'COMB_TYPE'
 					},
 					{
-						data: 'DISTRICT'
+					name: 'DISTRICT',
+					data: 'DISTRICT'
 					},
 					{
-						data: 'REG_DATE'
+					name: 'REG_DATE',
+					data: 'REG_DATE'
 					},
 					{
-						data: 'MAINT_AGEN'
+					name: 'MAINT_AGEN',
+					data: 'MAINT_AGEN'
 					},
 					{
-						data: 'SMR_CAT_CD'
+					name: 'SMR_CAT_CD',
+					data: 'SMR_CAT_CD'
 					},
 					{
-						data: 'SIFT_CLASS'
+					name: 'SIFT_CLASS',
+					data: 'SIFT_CLASS'
 					},
 					{
-						data: 'NPRS'
+					name: 'NPRS',
+					data: 'NPRS'
 					},
 					{
-						data: 'CAT'
+					name: 'CAT',
+					data: 'CAT'
 					},
 					{
-						data: 'LOCATION'
+					name: 'LOCATION',
+					data: 'LOCATION'
 					},
 				],
 				'order': [
@@ -2864,15 +2877,15 @@ function init_DataTables() {
 
 							if (!sCount) {
 								bootbox.alert({
-									message: "请选择要编辑的行！",
-									size: 'small'
+									message: "Please select the row you want to edit !",
+									// size: 'small'
 								});
 								return false;
 							}
 							if (sCount > 1) {
 								bootbox.alert({
-									message: "一次只能编辑一行，选择行数过多！",
-									size: 'small'
+									message: "Only one row can be edited at a time, too many rows have been selected !",
+									// size: 'small'
 								});
 								return false;
 							}
@@ -2894,7 +2907,7 @@ function init_DataTables() {
 							var sCount = $("table tr.selected").length;
 							if (!sCount) {
 								bootbox.alert({
-									message: "请选择要删除的行！！",
+									message: "Please select the row to delete !",
 									size: 'small'
 								});
 								return false;
@@ -2929,12 +2942,39 @@ function init_DataTables() {
 						extend: "excel",
 						className: "btn-primary table-btn",
 						text: 'Export',
+						exportOptions:{ 
+							'columns': '1,4,5,6,7,8,9,10,11,12'    //根据列序号选择指定列
+						}
 					},
 
 					{
 						extend: "print",
 						className: "btn-primary table-btn",
 						text: 'Print',
+						// message:'description message', //打印描述信息
+						exportOptions:{ //从DataTable中选择要收集的数据。这包括列、行、排序和搜索的选项。options选项参见：https://datatables.net/reference/api/buttons.exportData()
+							// 'format': { //用于导出将使用的单元格格式化函数的容器对象 format有三个子标签，header，body和foot
+							// 	header: function ( data, row, column, node ) { //body区域的function，可以操作需要导出excel的数据格式
+							// 		if(row == 0  || row == 2  || row == 3){
+							// 			return "";
+							// 		}
+							// 		else{
+							// 			return data;
+							// 		}
+							// 	},
+							// 	body: function ( data, row, column, node ) { //body区域的function，可以操作需要导出excel的数据格式
+							// 		if(row == 0  || row == 2  || row == 3){
+							// 			return "";
+							// 		}
+							// 		else{
+							// 			return data;
+							// 		}
+							// 	}
+							// },
+							// 'columns': 'SLOPE_NO:name,MAP:name'   //根据列名选择指定列
+							'columns': '1,4,5,6,7,8,9,10,11,12'    //根据列序号选择指定列
+						}
+			
 					},
 				],
 
