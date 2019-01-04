@@ -25,3 +25,8 @@
 .table-btn{
     margin-right: 10px !important;
 }
+
+.bootbox-body{
+    font-weight: 400;
+    font-size: 16px;
+}
