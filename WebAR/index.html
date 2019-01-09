@@ -1,0 +1,412 @@
+﻿<!DOCTYPE html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weui/1.1.3/style/weui.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-weui/1.2.1/css/jquery-weui.min.css">
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
+
+	<!-- three.js library -->
+	<script src='js/three.js'></script>
+	<script src='js/inflate.min.js'></script>
+	<script src='js/FBXLoader.js'></script>
+	<script src='js/OrbitControls.js'></script>
+	<script src='js/ar.js'></script>
+	<style>
+		html,
+		body {
+			margin: 0px;
+			padding: 0px;
+			height: 100%;
+			width: 100%;
+			overflow: hidden;
+		}
+
+		* {
+			touch-action: pan-y;
+		}
+
+		.weui-navbar2 {
+			display: none;
+			bottom: 0;
+			z-index: 1;
+			position: absolute;
+			width: 100%;
+			background-color: #fafafa;
+		}
+
+		.weui-popup__modal {
+			height: 50% !important;
+		}
+
+		.weui-popup__modal .modal-content {
+			text-align: justify;
+			padding: 2.2rem 0.5rem 0.5rem 0.5rem !important;
+		}
+
+		#loading {
+			position: fixed;
+			height: 100%;
+			width: 100%;
+			display: flex;
+			background-color: rgba(90, 95, 90, 0.5);
+			z-index: 999;
+		}
+
+		.weui-loadmore {
+			align-self: center;
+		}
+
+		.weui-loading {
+			height: 50px;
+			width: 50px;
+		}
+	</style>
+
+	<script>
+		// check API is available
+		if (navigator.mediaDevices === undefined ||
+			navigator.mediaDevices.enumerateDevices === undefined ||
+			navigator.mediaDevices.getUserMedia === undefined) {
+			alert("Your device does not support the AR function!")
+		}
+	</script>
+
+	<title>WebAR Demo</title>
+</head>
+
+
+<body>
+	<div id="loading">
+		<div class="weui-loadmore">
+			<i class="weui-loading"></i>
+			<p id="progress"></p>
+		</div>
+	</div>
+	<div style='position: absolute; top: 10px; width:100%; text-align: center;z-index:1' ;>
+		<h2 style="color: red;">WebAR Demo</h2>
+	</div>
+
+	<div class="weui-navbar2">
+		<div class="weui-navbar__item" onclick="$('#pop1').popup();">
+			<b>introduction</b>
+		</div>
+	</div>
+	<div id="pop1" class="weui-popup__container popup-bottom">
+		<div class="weui-popup__overlay"></div>
+		<div class="weui-popup__modal">
+			<div class="toolbar">
+				<div class="toolbar-inner">
+					<a href="javascript:;" class="picker-button close-popup">close</a>
+					<h1 class="title">introduction</h1>
+				</div>
+			</div>
+			<div class="modal-content">
+			</div>
+		</div>
+	</div>
+
+	<script>
+
+		//配置参数
+		var config = {
+			patternUrl: 'data/Central_Plaza.patt', //识别的marker文件
+			model: 'models/tingzi.fbx', //模型路径
+			introductionContent: 'This is just an example of AR.' //底部introduction内容,注释掉此行则不显示底部introduction
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+		if (config.introductionContent !== undefined) { //如果配置了introductionContent项则显示底部introduction
+			$("#pop1 .modal-content").text(config.introductionContent);
+			$(".weui-navbar2").show();
+		}
+		//////////////////////////////////////////////////////////////////////////////////
+		//		Init
+		//////////////////////////////////////////////////////////////////////////////////
+		var arWorldRoot;
+		// array of functions for the rendering loop
+		var onRenderFcts = [];
+
+		function init(object) {
+			// init renderer
+			var renderer = new THREE.WebGLRenderer({
+				alpha: true
+			});
+			renderer.setClearColor(new THREE.Color('lightgrey'), 0)
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.domElement.style.position = 'absolute'
+			renderer.domElement.style.top = '0px'
+			renderer.domElement.style.left = '0px'
+			document.body.appendChild(renderer.domElement);
+
+
+
+			// init scene and camera
+			var scene = new THREE.Scene();
+
+			var alight = new THREE.AmbientLight(0x808080);
+			var dlight = new THREE.DirectionalLight(0xffffff, 0.5);
+			dlight.position.set(1, 1, 1);
+
+			var plight = new THREE.PointLight(0xffffff, 0.4);
+			plight.position.set(2, 2, 2);
+
+			scene.add(alight);
+			scene.add(dlight);
+			scene.add(plight);
+
+			//////////////////////////////////////////////////////////////////////////////////
+			//		Initialize a basic camera
+			//////////////////////////////////////////////////////////////////////////////////
+
+			// Create a camera
+			var camera = new THREE.Camera;
+			scene.add(camera);
+
+			////////////////////////////////////////////////////////////////////////////////
+			//          handle arToolkitSource
+			////////////////////////////////////////////////////////////////////////////////
+
+			var arToolkitSource = new THREEx.ArToolkitSource({
+				// to read from the webcam 
+				sourceType: 'webcam',
+			})
+
+			arToolkitSource.init(function onReady() {
+				onResize()
+			})
+
+			// handle resize
+			window.addEventListener('resize', function () {
+				onResize()
+			})
+
+			function onResize() {
+				arToolkitSource.onResizeElement()
+				arToolkitSource.copyElementSizeTo(renderer.domElement)
+				if (arToolkitContext.arController !== null) {
+					arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas)
+				}
+			}
+
+			////////////////////////////////////////////////////////////////////////////////
+			//          initialize arToolkitContext
+			////////////////////////////////////////////////////////////////////////////////	
+
+			// create atToolkitContext
+			var arToolkitContext = new THREEx.ArToolkitContext({
+				cameraParametersUrl: 'data/camera_para.dat',
+				detectionMode: 'mono',
+
+				canvasWidth: 80 * 3,
+				canvasHeight: 60 * 3,
+
+				maxDetectionRate: 60,
+			})
+			// initialize it
+			arToolkitContext.init(function onCompleted() {
+				// copy projection matrix to camera
+				camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+			})
+
+			// update artoolkit on every frame
+			onRenderFcts.push(function () {
+				if (arToolkitSource.ready === false) return
+
+				arToolkitContext.update(arToolkitSource.domElement)
+			})
+
+
+			////////////////////////////////////////////////////////////////////////////////
+			//          Create a ArMarkerControls
+			////////////////////////////////////////////////////////////////////////////////
+
+			var markerRoot = new THREE.Group
+			scene.add(markerRoot)
+			var markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+				// type: 'barcode',
+				// barcodeValue: 5,
+
+				type: 'pattern',
+				patternUrl: config.patternUrl,
+			})
+
+
+			// build a smoothedControls
+			var smoothedRoot = new THREE.Group()
+			scene.add(smoothedRoot)
+			var smoothedControls = new THREEx.ArSmoothedControls(smoothedRoot, {
+				lerpPosition: 0.4,
+				lerpQuaternion: 0.3,
+				lerpScale: 1,
+				// minVisibleDelay: 1,
+				// minUnvisibleDelay: 1,
+			})
+			onRenderFcts.push(function (delta) {
+				smoothedControls.update(markerRoot)
+			})
+
+			//////////////////////////////////////////////////////////////////////////////////
+			//		add an object in the scene
+			//////////////////////////////////////////////////////////////////////////////////
+
+			// var arWorldRoot = markerRoot
+			arWorldRoot = smoothedRoot;
+
+			var mesh = new THREE.AxesHelper()
+
+			// render the scene
+			onRenderFcts.push(function () {
+				renderer.render(scene, camera);
+				// stats.update();
+			});
+
+			//注册触摸监听
+			touchOpra(renderer.domElement, object, 50, 0.03);
+		}
+
+
+		// run the rendering loop
+		var lastTimeMsec = null
+
+		function animate(nowMsec) {
+			// keep looping
+			requestAnimationFrame(animate);
+			// measure time
+			lastTimeMsec = lastTimeMsec || nowMsec - 1000 / 60
+			var deltaMsec = Math.min(200, nowMsec - lastTimeMsec)
+			lastTimeMsec = nowMsec
+			// call each update function
+			onRenderFcts.forEach(function (onRenderFct) {
+				onRenderFct(deltaMsec / 3000, nowMsec / 1000)
+			})
+		}
+
+		// FBX模型
+		var fbxloader, modleSize;
+		fbxloader = new THREE.FBXLoader();
+		fbxloader.load(config.model, function (object) {
+
+				//通过传入的object3D对象来返回当前模型的最小大小，值可以是一个mesh也可以是group
+				var box = new THREE.Box3();
+				box.expandByObject(object);
+				modleSize = new THREE.Vector3();
+				box.getSize(modleSize);
+				//获取模型最大边长
+				var maxBorder = modleSize.x > modleSize.y ? modleSize.x : modleSize.y;
+				maxBorder = maxBorder > modleSize.z ? maxBorder : modleSize.z;
+				object.scale.multiplyScalar(1 / maxBorder); // 缩放模型大小到1个长度单位
+
+				init(object);
+
+				object.position.y = modleSize.y / (2 * maxBorder);
+				// object.rotation.x = -0.5 * Math.PI;
+				// 加入到场景中
+				arWorldRoot.add(object);
+
+
+				requestAnimationFrame(animate);
+
+				//移除遮罩
+				$("#loading").remove();
+			},
+			function (progress) {
+				var prg = (progress.loaded / progress.total * 100).toFixed(0);
+				$("#progress").text(prg + "%");
+			},
+			function (error) {
+				alert(error);
+			}
+		);
+
+		//触摸操作类
+		function touchOpra(dom, model, roRate, scaleRate) {
+			var dom = dom;
+			var model = model;
+			// 初始缩放倍数
+			var scale = 1 / Math.max(modleSize.x, modleSize.y, modleSize.z);
+
+			var startX = null,
+				startDist = null;
+
+
+
+			var onTouchStart = function (evt) {
+				// 单指滑动
+				if (evt.touches.length == 1) {
+					var touch = evt.touches[0];
+					// if (touch.target.parentNode == canvas_container)
+					startX = parseInt(touch.clientX);
+				}
+				// 双指缩放
+				else if (evt.touches.length == 2) {
+					onTouchEnd();
+					startDist = dist(evt.touches[0].clientX, evt.touches[0].clientY, evt.touches[1].clientX, evt.touches[1].clientY);
+				}
+			}
+
+			var onTouchMove = function (evt) {
+				// 单指滑动
+				if (evt.touches.length == 1 && startX != null) {
+					var touch = evt.touches[0];
+					evt.preventDefault();
+					//根据X轴方向滑动距离旋转模型
+					var moveDist = parseInt(touch.clientX) - startX;
+					if (moveDist !== 0) {
+						var roaDirection = moveDist / Math.abs(moveDist);
+						model.rotation.y += (Math.PI / roRate) * roaDirection;
+						startX = parseInt(touch.clientX);
+					}
+
+				}
+
+				// 双指缩放
+				else if (evt.touches.length == 2 && startDist != null) {
+					evt.preventDefault();
+					var d = dist(evt.touches[0].clientX, evt.touches[0].clientY, evt.touches[1].clientX, evt.touches[1].clientY);
+					var diff = d - startDist;
+
+					if (diff !== 0) {
+						var direction = diff / Math.abs(diff);
+						//限制缩放范围
+						if ((model.scale.x / scale < 0.5 && direction < 0) || model.scale.x / scale > 2 && direction > 0) return;
+
+						model.scale.z = model.scale.y = model.scale.x += model.scale.x * direction * scaleRate;
+						model.position.y = (modleSize.y / 2) * model.scale.x;
+
+						startDist = d;
+					}
+				}
+			}
+
+			var onTouchEnd = function (evt) {
+				startX = null;
+				startDist = null;
+			}
+
+			var dist = function (x1, y1, x2, y2) {
+				var x = x2 - x1;
+				var y = y2 - y1;
+				return x * x + y * y;
+			}
+
+			dom.addEventListener("touchstart", onTouchStart, false);
+			dom.addEventListener("touchmove", onTouchMove, false);
+			document.addEventListener("touchend", onTouchEnd, false);
+		}
+	</script>
+</body>
