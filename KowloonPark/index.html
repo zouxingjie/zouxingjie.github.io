@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<title>Kowloon Park</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+	<link href="photo-sphere-viewer.css" rel="stylesheet" />
+	<script src="three.min.js"></script>
+	<script src="DeviceOrientationControls.js"></script>
+	<script src="photo-sphere-viewer.js"></script>
+	<script src="PSVError.js"></script>
+	<script src="PSVUtils.js"></script>
+	<script src="PSVMarker.js"></script>
+	<style>
+		html,
+		body {
+			margin: 0;
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+		}
+
+		#container {
+			width: 100%;
+			height: 100%;
+		}
+
+		#imgContainer img {
+			padding: 7px;
+			-moz-border-radius: 5px;
+			-webkit-border-radius: 5px;
+			border-radius: 5px;
+			-moz-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .15);
+			-webkit-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .15);
+			box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .5);
+		}
+
+		#map {
+			height: 100%;
+			text-align: center;
+			overflow: auto;
+			background: url(img/pattern.jpg);
+		}
+
+		.title h1 {
+			display: inline-block;
+			margin-top: 60px;
+			padding-bottom: 10px;
+			font-size: 36px;
+			font-weight: 400;
+			color: #2d2d2d;
+			border-bottom: 1px dotted #aaa;
+		}
+
+		.marker {
+			position: absolute;
+			overflow: visible;
+			opacity: 1;
+			cursor: pointer;
+			pointer-events: auto;
+			background-image: url(img/tunnel.png);
+			width: 86px;
+			height: 104px;
+			background-position: 0px 0px;
+			background-size: 86px 104px;
+			/*去除移动端点击产生的边框 */
+			-webkit-tap-highlight-color: rgba(255, 0, 0, 0);
+		}
+
+		.markerImg {
+			border-radius: 50%;
+			overflow: visible;
+			opacity: 1;
+			cursor: default;
+			pointer-events: none;
+			width: 60px;
+			height: 60px;
+			background-position: 0px 0px;
+			background-size: 60px 60px;
+			transform: translate(13px, 14px);
+		}
+
+		.markerDesc {
+			margin-top: -74px;
+			border-radius: 5px;
+		}
+
+		.markerDesc font {
+			background-color: rgba(0, 0, 0, 0.6);
+			color: white;
+		}
+
+		.marker:hover {
+			transform: scale(1.5, 1);
+		}
+
+		.dotContainer{
+			position: fixed;
+			top:50%;
+			left:50%;
+			margin-top: -50px;
+			margin-left: -50px;
+			width: 0;
+            height: 0;
+            border: 50px solid;
+            border-radius: 100px;
+            border-color: transparent transparent transparent transparent;
+            animation: waiting 0s linear 1;
+            /* Safari 和 Chrome */
+            -webkit-animation: waiting 0s linear 1;
+		}	
+		.dot{
+			position: absolute;
+			height: 10px;
+			width: 10px;
+			background:white;
+			border-radius: 50%;
+			top:50%;
+			left:50%;
+			margin-top: -5px;
+			margin-left: -5px;
+		}	
+		@keyframes clearAnimat {
+            from{
+            }
+            to{
+            }
+        }
+		@keyframes waiting {
+            0% {
+                border-color: transparent transparent transparent transparent;
+            }
+            25%{
+                border-color: rgba(141, 213, 241, 1) transparent transparent transparent;
+            }
+            50%{
+                border-color: rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) transparent transparent;
+            }
+            75%{
+                border-color: rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) transparent;
+            }
+            100%{
+                border-color: rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) rgba(141, 213, 241, 1);
+            }
+        }
+
+        @-moz-keyframes waiting
+        /* Firefox */
+
+            {
+                0% {
+                border-color: transparent transparent transparent transparent;
+            }
+            25%{
+                border-color: rgba(141, 213, 241, 1) transparent transparent transparent;
+            }
+            50%{
+                border-color: rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) transparent transparent;
+            }
+            75%{
+                border-color: rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) transparent;
+            }
+            100%{
+                border-color: rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) rgba(141, 213, 241, 1);
+            }
+        }
+
+        @-webkit-keyframes waiting
+        /* Safari 和 Chrome */
+
+            {
+                0% {
+                border-color: transparent transparent transparent transparent;
+            }
+            25%{
+                border-color: rgba(141, 213, 241, 1) transparent transparent transparent;
+            }
+            50%{
+                border-color: rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) transparent transparent;
+            }
+            75%{
+                border-color: rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) transparent;
+            }
+            100%{
+                border-color: rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) rgba(141, 213, 241, 1);
+            }
+        }
+
+        @-o-keyframes waiting
+        /* Opera */
+
+            {
+                0% {
+                border-color: transparent transparent transparent transparent;
+            }
+            25%{
+                border-color: rgba(141, 213, 241, 1) transparent transparent transparent;
+            }
+            50%{
+                border-color: rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) transparent transparent;
+            }
+            75%{
+                border-color: rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) transparent;
+            }
+            100%{
+                border-color: rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) rgba(141, 213, 241, 1) rgba(141, 213, 241, 1);
+            }
+        }
+		
+	</style>
+</head>
+
+<body>
+	<div id="container"></div>
+	<div id="map">
+		<div class="title">
+			<h1>Kowloon Park </h1>
+		</div>
+		<div id="imgContainer" style="display: inline-flex;position: relative;">
+			<img id="baseMap" src="img/Main-Start.jpg" alt="baseMap" usemap="#map-img" />
+			<div class="marker" style="left:250px;top:400px;" onclick="updateView('Haiphone_Road')">
+				<div class="markerImg" style="background-image: url(img/Haiphone_Road_icon.jpg);"></div>
+				<div class="markerDesc">
+					<font>HaiphoneRoad</font>
+				</div>
+			</div>
+			<div class="marker" style="left:980px;top:0px;" onclick="updateView('AustinRoad')">
+				<div class="markerImg" style="background-image: url(img/AustinRoad_icon.jpg);"></div>
+				<div class="markerDesc">
+					<font>AustinRoad</font>
+				</div>
+			</div>
+			<div class="marker" style="left:1010px;top:300px;" onclick="updateView('East_entrance')">
+				<div class="markerImg" style="background-image: url(img/East_entrance_icon.jpg);"></div>
+				<div class="markerDesc">
+					<font>Eastentrance</font>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+		var div = document.getElementById('container');
+		var PSV = new PhotoSphereViewer({
+			panorama: 'img/default.jpg',//默认全景图
+			container: div,
+			time_anim: false,
+			navbar: true,
+			navbar_style: {
+				backgroundColor: 'rgba(58, 67, 77, 0.7)'
+			},
+			loading_html: '<div style="weidth:100%;height:100%; background:url(img/loading.gif) no-repeat  center;background-size:80px 80px; position:relative;"></div>',
+			// Overlay logo
+			overlay: {
+				image: 'img/aecom-logo.png',
+				size: {
+					width: '200px'
+				},
+				position: {
+					x: 'left',
+					y: 'top'
+				}
+			},
+			backImgUrl:'img/back.png',  //返回图标路径
+			//左下角平面图
+			minMapOption:{
+				title:'平面图',
+				imgUrl:'img/minMap.png'  //平面图路径
+			},
+			onready:function(){document.getElementById("container").style.display = "none";}, //加载完成触发事件
+			scenes: {
+				Haiphone_Road: {
+					imgUrl: "img/Haiphone-Road.jpg",//全景图片路径
+					minMapPositon: { x: 379, y: 68 }, //小地图定位坐标
+					CorrectDeg: 90,     //定位方向修正（度）
+					markers: [
+						{
+							name: 'AustinRoad',
+							x: -8,          //x坐标
+							y: -2,          //y坐标
+							z: 0,         //z坐标
+							rx: Math.PI / 2,        //x轴旋转
+							ry: 0,            //y轴旋转
+							rz: Math.PI * 0.55,          //z轴旋转
+							scale: 1           //缩放比例
+						},
+						{
+							name: 'East_entrance',
+							x: 0,          //x坐标
+							y: -2,          //y坐标
+							z: -8,         //z坐标
+							rx: Math.PI / 2,        //x轴旋转
+							ry: 0,            //y轴旋转
+							rz: Math.PI * 1.06,          //z轴旋转
+							scale: 1           //缩放比例
+						}
+					]
+				},
+				AustinRoad: {
+					imgUrl: "img/AustinRoad.jpg",//全景图片路径
+					minMapPositon: { x: -15, y: 113 }, //小地图定位坐标
+					CorrectDeg: 90,     //定位方向修正（度）
+					markers: [
+						{
+							name: 'Haiphone_Road',
+							x: 8,          //x坐标
+							y: -2,          //y坐标
+							z: 6,         //z坐标
+							rx: Math.PI / 2,        //x轴旋转
+							ry: 0,            //y轴旋转
+							rz: Math.PI * 3 / 2,          //z轴旋转
+							scale: 1           //缩放比例
+						},
+						{
+							name: 'East_entrance',
+							x: -2,          //x坐标
+							y: -2,          //y坐标
+							z: -8,         //z坐标
+							rx: Math.PI / 2,        //x轴旋转
+							ry: 0,            //y轴旋转
+							rz: Math.PI * 0.95,          //z轴旋转
+							scale: 1           //缩放比例
+						}
+					]
+				},
+				East_entrance: {
+					imgUrl: "img/East-entrance.jpg",//全景图片路径
+					minMapPositon: { x: 200, y: 240 }, //小地图定位坐标
+					CorrectDeg: 0,     //定位方向修正（度）
+					markers: [
+						{
+							name: 'Haiphone_Road',
+							x: -4,          //x坐标
+							y: -2,          //y坐标
+							z: 8,         //z坐标
+							rx: Math.PI / 2,        //x轴旋转
+							ry: 0,            //y轴旋转
+							rz: 0,          //z轴旋转
+							scale: 1           //缩放比例
+						},
+						{
+							name: 'AustinRoad',
+							x: -3,          //x坐标
+							y: -2,          //y坐标
+							z: -8,         //z坐标
+							rx: Math.PI / 2,        //x轴旋转
+							ry: 0,            //y轴旋转
+							rz: Math.PI,          //z轴旋转
+							scale: 1           //缩放比例
+						}
+					]
+				}
+			}
+		});
+
+		function updateView(scene) {
+			PSV.updateTexture(scene);
+		}
+	</script>
+</body>
+
+</html>
