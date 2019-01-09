@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weui/1.1.3/style/weui.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-weui/1.2.1/css/jquery-weui.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+    <script src="js/three.js" type="text/javascript"></script>
+    <script src='js/inflate.min.js'></script>
+    <script src='js/FBXLoader.js'></script>
+    <script src='js/OrbitControls.js'></script>
+    <style>
+        html,body{
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    }
+    * { touch-action: pan-y; }
+
+    #loading{
+        position:fixed;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        background-color: rgba(90, 95, 90, 0.5);
+        z-index: 999;
+    }
+    .weui-loadmore{
+        align-self: center;
+    }
+    .weui-loading{
+        height: 50px;
+        width: 50px;
+    }
+
+    </style>
+    <title>Web3D</title>
+</head>
+
+<body>
+    <div id="loading">
+        <div class="weui-loadmore">
+            <i class="weui-loading"></i>
+            <p id="progress"></p>
+        </div>
+    </div>
+</body>
+
+</html>
+<script type="text/javascript">
+    var modelUrl = 'models/Central_Plaza.fbx'; //模型路径
+
+
+    var scene, camera, controls, render, Axis, mesh, alight, plight, box, pos, modleSize, maxBorder;
+
+    var loader = new THREE.FBXLoader();
+    loader.load(modelUrl, function (object) {
+            //获取模型参数
+            box = new THREE.Box3();
+            //通过传入的object3D对象来返回当前模型的最小大小，值可以是一个mesh也可以是group
+            box.expandByObject(object);
+            modleSize = new THREE.Vector3();
+            box.getSize(modleSize);
+            //获取模型最大边长
+            maxBorder = modleSize.x > modleSize.y ? modleSize.x : modleSize.y;
+            maxBorder = maxBorder > modleSize.z ? maxBorder : modleSize.z;
+            object.scale.multiplyScalar(1 / maxBorder); // 缩放模型大小至1个单位长度
+
+            mesh = object;
+            init(object);
+            animate();
+            //移除遮罩
+            $("#loading").remove();
+        }, function (progress) {
+            var prg = (progress.loaded / progress.total * 100).toFixed(0);
+            $("#progress").text(prg + "%");
+        },
+        function (error) {
+            alert(error);
+        }
+    );
+
+    function init(object) {
+        // 老三样 场景scene，相机camera，渲染器render
+        scene = new THREE.Scene();
+
+        alight = new THREE.AmbientLight(0x808080);
+        dlight = new THREE.DirectionalLight(0xffffff, 0.7);
+        dlight.position.set(1, 1, 1);
+
+        plight = new THREE.PointLight(0xffffff, 0.4);
+        plight.position.set(2, 2, 2);
+
+        scene.add(alight);
+        scene.add(dlight);
+        scene.add(plight);
+
+        //添加坐标系
+        Axis = new THREE.AxesHelper();
+        scene.add(Axis)
+
+        //添加格网
+        // var helper = new THREE.GridHelper(1000, 50);
+        // helper.setColors(0x0000ff, 0x808080);
+        // scene.add(helper);
+
+        var fov = 45;
+        var height = modleSize.y / maxBorder;
+        var width = modleSize.x / maxBorder;
+        var dist = (width > height ? width : height) / (2 * Math.tan(fov * Math.PI / 360));
+        pos = new THREE.Vector3();
+        box.getCenter(pos);
+        // 相机
+        camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 1000);
+        // camera = new THREE.Camera();
+        camera.position.set(0, 0, dist * 1.1); // fudge factor so you can see the boundaries
+        // camera.lookAt(pos);
+
+        // 渲染器
+        renderer = new THREE.WebGLRenderer();
+
+        //背景颜色修改一下
+        renderer.setClearColor(0xf0f0f0);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        //显示在窗体
+        document.body.appendChild(renderer.domElement);
+
+        //控制器
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+        // controls.target = pos;
+        //设置相机距离原点的最远距离
+        controls.minDistance = 0.1;
+        //设置相机距离原点的最远距离
+        controls.maxDistance = 100;
+        //是否开启右键拖拽
+        controls.enablePan = false;
+        controls.update();
+
+
+        object.mixer = new THREE.AnimationMixer(object);
+
+        if (object.animations.length) {
+            var action = object.mixer.clipAction(object.animations[0]);
+            action.play();
+        }
+
+
+        object.traverse(function (child) {
+            if (child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+        });
+
+        // object.scale.x = 0.05;
+        // object.scale.y = 0.05;
+        // object.scale.z = 0.05;
+        // object.position.x = -600;
+        object.rotation.x = -0.5 * Math.PI;  //绕x轴旋转模型
+
+        object.position.y = modleSize.y / (2 * maxBorder);
+        object.position.y = 0;
+        scene.add(object);
+
+        window.addEventListener('resize', onWindowResize, false);
+    }
+
+    function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate() {
+        // mesh.rotation.x -= 0.005 * Math.PI;
+        // 渲染
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+    }
+</script>
