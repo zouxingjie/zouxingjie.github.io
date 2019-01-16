@@ -24,9 +24,63 @@
 
 .table-btn{
     margin-right: 10px !important;
+    width: 65px;
+    margin-left: 0px !important;
+    margin-bottom: 10px !important;
 }
 
 .bootbox-body{
     font-weight: 400;
     font-size: 16px;
 }
+
+.dt-buttons.btn-group{
+    display: flex !important;
+    flex-flow: wrap !important;
+}
+
+.footer_fixed footer{
+    z-index: 10;
+}
+
+div.dataTables_wrapper div.dataTables_filter{
+    text-align: right;
+    width: 100%;
+}
+
+.x_title h2{
+    font-weight: 600;
+    font-size: large;
+    width: 100%;
+}
+
+
+.login_title{
+    text-align: center;
+}
+
+.form-group a{
+    color: #09a1ec;
+    padding-left: 10px;
+}
+
+.form-group .panel-heading{
+    padding-left: 0px !important;
+}
+
+.form-group .panel-body{
+    padding-right: 0px;
+}
+
+.EI_FORM_Item label{
+    width: 80% !important;
+}
+.EI_FORM_Item div{
+    width: 15% !important;
+}
+
+.EI_FORM_Item select{
+    padding: 0 0;
+    min-width: 47px;
+}
+
