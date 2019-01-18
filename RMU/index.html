@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>RMU</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+    <style>
+        /* div {
+            height: 300px;
+            width: 400px;
+            border: 1px solid red;
+            background-image: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%20version%3D%221.1%22%3E%3Cline%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20x1%3D%22100%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%22100%22%20style%3D%22stroke%3Argb(0%2C0%2C0)%3Bstroke-width%3A1%22%2F%3E%3C%2Fsvg%3E');
+            background-size: 100% 100%;
+        } */
+
+        ul {
+            padding: 0;
+        }
+
+        li {
+            list-style: none;
+        }
+
+        hr {
+            height: 3px;
+            margin: 0;
+            background-color: black;
+        }
+
+        .main {
+            width: 100%;
+            max-width: 1024px;
+            margin: auto;
+            box-shadow: 2px 2px 5px #888888;
+        }
+
+        .title {
+            color: #797877;
+        }
+
+        .right {
+            float: right;
+        }
+
+        .table {
+            margin-bottom:40px;
+        }
+        .table .Ttitle{
+            font-weight: bold;
+        }
+        .table img{
+            margin: auto;
+        }
+        .table>ul {
+            display: flex;
+        }
+        .table>ul>li {
+            flex: 1;
+            display: flex;
+            padding-left: 5px;
+        }
+        .table>ul>li>div {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+        .table>ul>li>div>input {
+            border: none;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 30px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .table .checkRow{
+            height: 40px;
+        }
+        .table .checkRow .rowL{
+            flex: 0.5;
+        }
+        .table .checkRow .rowM{
+            flex: 8;
+        }
+        .table .checkRow .rowR{
+            flex: 1.5;
+        }
+
+        ul .borderT {
+            border-top: 1px solid black;
+        }
+
+        ul .borderTB {
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+        }
+        li .borderR{
+            border-right: 1px solid black;
+        }
+        .redColor{
+            color: red;
+        }
+        .footerBtn{
+            position: fixed;
+            z-index: 999;
+            bottom: 2px;
+            width: 100%;
+            display: flex;
+        }
+        .footerBtn>div{
+            flex: 1;
+            text-align:center;
+        }
+        .footerBtn>div>button{
+            background: #0ea8d8;
+            width:90px;
+            color: #ffffff;
+        }
+        .jconfirm-box{
+            display: inline-table;
+        }
+        .jconfirm-box-container{
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="footerBtn">
+        <div class="LBtn">
+            <button class="ui-button ui-widget ui-corner-all" id="save">Save</button>
+        </div>
+        <div class="RBtn">
+            <button class="ui-button ui-widget ui-corner-all" id="commit">Commit</button>
+        </div>
+    </div>
+    <div class="main">
+        <ul>
+            <li class="title">
+                <div>
+                    <span>ENGINEERING PROJECTS DEPARTMENT</span>
+                    <span class="right">FORM NO. 132-RMU-01</span>
+                </div>
+                <div>
+                    <span>132kV RING MAIN UNIT (RMU) PRE-COMMISSIONING TEST FORM</span>
+                </div>
+            </li>
+            <hr>
+            <li class="table">
+                <ul class="borderT">
+                    <li class="borderR">
+                        <div>SUBSTATION (SCADA CODE)</div>
+                        <div>
+                            <input type="text" value="TIA">
+                        </div>
+                    </li>
+                    <li>
+                        <div>VOLTAGE LEVEL</div>
+                        <div>
+                            <input type="text" value="132kV">
+                        </div>
+                    </li>
+                </ul>
+                <ul class="borderTB">
+                    <li class="borderR">
+                        <div>PROJECT NO</div>
+                        <div>
+                            <input type="text" value="16-604">
+                        </div>
+                    </li>
+                    <li>
+                        <div>DATE(DD/MM/YYYY)</div>
+                        <div>
+                            <input type="text" value="">
+                        </div>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="table">
+                <span class="Ttitle">EQUIPMENT DATA</span>
+                <ul class="borderT">
+                    <li class="borderR">
+                        <div>CIRCUIT NAME</div>
+                        <div>
+                            <input type="text" value="RMU">
+                        </div>
+                    </li>
+                    <li>
+                        <div>CLP NO</div>
+                        <div>
+                            <input type="text" value="5229777">
+                        </div>
+                    </li>
+                </ul>
+                <ul class="borderT">
+                    <li class="borderR">
+                        <div>MANUFACTURER/MODEL</div>
+                        <div>
+                            <input type="text" value="Xian XD Switchgear Electric Co., Ltd / ZF7A-145">
+                        </div>
+                    </li>
+                    <li>
+                        <div>SERIAL NO</div>
+                        <div>
+                            <input type="text" value="1GBH03304">
+                        </div>
+                    </li>
+                </ul>
+                <ul class="borderT">
+                    <li class="borderR">
+                        <div>CIRCUIT NAME – WAY 1</div>
+                        <div>
+                            <input type="text" value="50MVA 132/11kV Tx.H1">
+                        </div>
+                    </li>
+                    <li>
+                        <div>CIRCUIT NAME – WAY 2</div>
+                        <div>
+                            <input type="text" value="SPARE">
+                        </div>
+                    </li>
+                </ul>
+                <ul class="borderT">
+                    <li class="borderR">
+                        <div>CIRCUIT NAME – WAY 3</div>
+                        <div>
+                            <input type="text" value="TKO China Unicom RMU">
+                        </div>
+                    </li>
+                    <li>
+                        <div>CIRCUIT NAME – WAY 4(if any)</div>
+                        <div>
+                            <input type="text" value="N/A">
+                        </div>
+                    </li>
+                </ul>
+                <ul class="borderTB">
+                    <li class="borderR">
+                        <div>RATED CURRENT (A)</div>
+                        <div>
+                            <input type="text" value="1600">
+                        </div>
+                    </li>
+                    <li>
+                        <div>RATED FREQ. (Hz)</div>
+                        <div>
+                            <input type="text" value="50">
+                        </div>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="table">
+                <span class="Ttitle">TEST INSTRUMENT</span>
+                <ul class="borderT">
+                    <li class="borderR">
+                        <div>CIRCUIT NAME</div>
+                    </li>
+                    <li class="borderR">
+                        <div>CIRCUIT NAME</div>
+                    </li>
+                    <li>
+                        <div>CLP NO</div>
+                    </li>
+                </ul>
+                <ul class="borderT">
+                    <li class="borderR">
+                        <div>
+                            <input type="text" value="5kV Megger">
+                        </div>
+                    </li>
+                    <li class="borderR">
+                        <div>
+                            <input type="text" value="5072524">
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <input type="text" value="29.12.2018">
+                        </div>
+                    </li>
+                </ul>
+                <ul class="borderT">
+                    <li class="borderR">
+                        <div>
+                            <input type="text" value="Multimeter">
+                        </div>
+                    </li>
+                    <li class="borderR">
+                        <div>
+                            <input type="text" value="5047630">
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <input type="text" value="24.3.2019">
+                        </div>
+                    </li>
+                </ul>
+                <ul class="borderT">
+                    <li class="borderR">
+                        <div>
+                            <input type="text" value="Digital Multimeter – Fluke 189">
+                        </div>
+                    </li>
+                    <li class="borderR">
+                        <div>
+                            <input type="text" value="5082563">
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <input type="text" value="6.4.2020">
+                        </div>
+                    </li>
+                </ul>
+                <ul class="borderT">
+                    <li class="borderR">
+                        <div>
+                            <input type="text" value="">
+                        </div>
+                    </li>
+                    <li class="borderR">
+                        <div>
+                            <input type="text" value="">
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <input type="text" value="">
+                        </div>
+                    </li>
+                </ul>
+                <ul class="borderT">
+                    <li class="borderR">
+                        <div>
+                            <input type="text" value="">
+                        </div>
+                    </li>
+                    <li class="borderR">
+                        <div>
+                            <input type="text" value="">
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <input type="text" value="">
+                        </div>
+                    </li>
+                </ul>
+                <ul class="borderTB">
+                    <li class="borderR">
+                        <div>
+                            <input type="text" value="">
+                        </div>
+                    </li>
+                    <li class="borderR">
+                        <div>
+                            <input type="text" value="">
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <input type="text" value="">
+                        </div>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="table">
+                <span class="Ttitle">REMARK</span>
+                <ul class="borderT">
+                    <li>
+                        <div><img src="pic1.png" alt=""></div>
+                    </li>
+                </ul>
+                <ul class="borderT">
+                    <li class="borderR">
+                        <div>CHECKED BY SITE ENGINEER</div>
+                    </li>
+                    <li>
+                        <div>APPROVED BY ENGINEER I</div>
+                    </li>
+                </ul>
+                <ul class="borderT">
+                    <li class="borderR">
+                        <div>FULL NAME</div>
+                    </li>
+                    <li class="borderR">
+                        <div>SIGNATURE & DATE</div>
+                    </li>
+                    <li class="borderR">
+                        <div>FULL NAME</div>
+                    </li>
+                    <li>
+                        <div>SIGNATURE & DATE</div>
+                    </li>
+                </ul>
+                <ul class="borderTB">
+                    <li class="borderR">
+                        <div>
+                            <input type="text" value="Li, Kin Ming">
+                        </div>
+                    </li>
+                    <li class="borderR">
+                        <div>
+                            <input type="text" value="">
+                        </div>
+                    </li>
+                    <li class="borderR">
+                        <div>
+                            <input type="text" value="Yeung, Tat Kwong">
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <input type="text" value="">
+                        </div>
+                    </li>
+                </ul>
+
+            </li>
+
+
+            <li class="table">
+                <span class="Ttitle">1. GENERAL INSPECTION</span>
+                <ul class="borderTB">
+                    <li>
+                        <div class="Ttitle">1.1 Ring Main Unit (RMU) Main Parts</div>
+                    </li>
+                </ul>
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>1</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Check cleanliness & tidiness</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-1"></label>
+                                <input type="checkbox" name="checkbox-1.1-1" id="checkbox-1.1-1">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-1"
+                                    id="attach-1.1-1">
+                            </div>
+
+                        </div>
+                    </li>
+                </ul>
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>2</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Check no damage on RMU appearance</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-2"></label>
+                                <input type="checkbox" name="checkbox-1.1-2" id="checkbox-1.1-2">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-2"
+                                    id="attach-1.1-2">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>3</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Painting satisfactory</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-3"></label>
+                                <input type="checkbox" name="checkbox-1.1-3" id="checkbox-1.1-3">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-3"
+                                    id="attach-1.1-3">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>4</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Check no short shipped parts or components</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-4"></label>
+                                <input type="checkbox" name="checkbox-1.1-4" id="checkbox-1.1-4">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-4"
+                                    id="attach-1.1-4">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>5</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Check provision of tools</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-5"></label>
+                                <input type="checkbox" name="checkbox-1.1-5" id="checkbox-1.1-5">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-5"
+                                    id="attach-1.1-5">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="checkRow redColor">
+                    <li class="borderR rowL">
+                        <div>6</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Check busbar conductors and jumpers condition satisfactory</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-6"></label>
+                                <input type="checkbox" name="checkbox-1.1-6" id="checkbox-1.1-6">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-6"
+                                    id="attach-1.1-6">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>7</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Provision of covers over pressure gauges (For outdoor installation)</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-7"></label>
+                                <input type="checkbox" name="checkbox-1.1-7" id="checkbox-1.1-7">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-7"
+                                    id="attach-1.1-7">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>8</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Protection guards provided on easily accessible moving parts</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-8"></label>
+                                <input type="checkbox" name="checkbox-1.1-8" id="checkbox-1.1-8">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-8"
+                                    id="attach-1.1-8">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>9</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Gas barrier painted for identification</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-9"></label>
+                                <input type="checkbox" name="checkbox-1.1-9" id="checkbox-1.1-9">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-9"
+                                    id="attach-1.1-9">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="checkRow redColor">
+                    <li class="borderR rowL">
+                        <div>10</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Provision of circuit labels at control panel door</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-10"></label>
+                                <input type="checkbox" name="checkbox-1.1-10" id="checkbox-1.1-10">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-10"
+                                    id="attach-1.1-10">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>11</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Provision of circuit labels at cable sealing end chambers</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-11"></label>
+                                <input type="checkbox" name="checkbox-1.1-11" id="checkbox-1.1-11">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-11"
+                                    id="attach-1.1-11">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>12</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Provision of label on local/off/remote switch</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-12"></label>
+                                <input type="checkbox" name="checkbox-1.1-12" id="checkbox-1.1-12">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-12"
+                                    id="attach-1.1-12">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>13</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Check locking facilities of door and switches at control pane</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-13"></label>
+                                <input type="checkbox" name="checkbox-1.1-13" id="checkbox-1.1-13">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-13"
+                                    id="attach-1.1-13">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>14</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Check locking facilities for circuit breakers, disconnecting switches & earthing switches</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-14"></label>
+                                <input type="checkbox" name="checkbox-1.1-14" id="checkbox-1.1-14">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-14"
+                                    id="attach-1.1-14">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>15</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Provision of CB lock pins</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-15"></label>
+                                <input type="checkbox" name="checkbox-1.1-15" id="checkbox-1.1-15">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-15"
+                                    id="attach-1.1-15">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>16</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Circuit labels & switch descriptions provided next to the ON/OFF indicators at mechanism
+                            box of circuit breaker, earthing switches and disconnecting switches</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-16"></label>
+                                <input type="checkbox" name="checkbox-1.1-16" id="checkbox-1.1-16">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-16"
+                                    id="attach-1.1-16">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>17</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Provision of label for manual operation direction for earthing switches and disconnecting
+                            switches</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-17"></label>
+                                <input type="checkbox" name="checkbox-1.1-17" id="checkbox-1.1-17">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-17"
+                                    id="attach-1.1-17">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>18</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Check water tightness of control panel & mechanism box cover</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-18"></label>
+                                <input type="checkbox" name="checkbox-1.1-18" id="checkbox-1.1-18">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-18"
+                                    id="attach-1.1-18">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="checkRow redColor">
+                    <li class="borderR rowL">
+                        <div>19</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Provision of cover for those exposed AC 220/380V live terminals</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-19"></label>
+                                <input type="checkbox" name="checkbox-1.1-19" id="checkbox-1.1-19">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-19"
+                                    id="attach-1.1-19">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>20</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>SF6 gas system layout satisfactory (Ease of gas filling, all compartments monitored)</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-20"></label>
+                                <input type="checkbox" name="checkbox-1.1-20" id="checkbox-1.1-20">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-20"
+                                    id="attach-1.1-20">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>21</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>SF6 pressure setting labels provided near the pressure gauges</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-21"></label>
+                                <input type="checkbox" name="checkbox-1.1-21" id="checkbox-1.1-21">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-21"
+                                    id="attach-1.1-21">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>22</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Pressure switch/gauge settings are correct</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-22"></label>
+                                <input type="checkbox" name="checkbox-1.1-22" id="checkbox-1.1-22">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-22"
+                                    id="attach-1.1-22">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="checkRow">
+                    <li class="borderR rowL">
+                        <div>23</div>
+                    </li>
+                    <li class="borderR rowM">
+                        <div>Protective covers provided over SF6 pipe-works (if necessary)</div>
+                    </li>
+                    <li class=" rowR">
+                        <div>
+                            <div>
+                                <label for="checkbox-1.1-23"></label>
+                                <input type="checkbox" name="checkbox-1.1-23" id="checkbox-1.1-23">
+                            </div>
+                            <div>
+                                <input type="file" accept="image/png,image/jpeg,image/gif,image/jpg" name="attach-1.1-23"
+                                    id="attach-1.1-23">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <!-- <label for="checkbox-1"></label>
+    <input type="checkbox" name="checkbox-1" id="checkbox-1"> -->
+
+
+</body>
+<script>
+    $(function () {
+
+        $("input[type='checkbox']").checkboxradio();
+
+        $("#save").click(function () {
+            $.alert({
+                type: 'green',
+                title: '',
+                content: "Save successfully!",
+                backgroundDismiss:true,
+                buttons: false,
+                closeIcon: false,
+            });
+
+
+        });
+
+        $("#commit").click(function () {
+            $.confirm({
+                type: 'green',
+                title: 'Commit successfully!',
+                icon: 'fa fa-check fa-lg',
+                content: '<div id="qrcode"></div>',
+                onOpenBefore: function () {
+                    // 生成二维码
+                    $('#qrcode').qrcode({
+                        render: "canvas", //也可以替换为table
+                        foreground: "#0a0a0a",
+                        background: "#FFF",
+                        text: "http://cnshz1pc1737:8080/RMU/"
+                    });
+                },
+                buttons: {
+                    close: {
+                        text: 'close',
+                        btnClass: 'btn-blue',
+                        action: function () {}
+                    }
+                }
+            });
+
+        });
+    });
+</script>
+
+
+</html>
