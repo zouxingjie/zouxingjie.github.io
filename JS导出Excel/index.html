@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>JS导出Excel</title>
+    <script type="text/javascript" src="xlsx.core.min.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        div {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #95A5A6;
+        }
+
+            div button {
+                height: 100px;
+                width: 200px;
+                outline: none;
+                border: 0px;
+                border-radius: 30px;
+                font-size: 40px;
+                color: white;
+                cursor: pointer;
+                background-color: #3498DB;
+            }
+                div button:hover {
+                    box-shadow: 0px 0px 5px 5px #2980B9;
+                }
+    </style>
+</head>
+<body>
+    <div>
+        <button onclick="exports.downloadExl();">导出</button>
+    </div>
+</body>
+</html>
+<script type="text/javascript">
+
+    var exports = {};
+
+
+    /**
+2    * 导出列表方法
+3    * @param {*} data  需要导出的数据  数组形式  [[表头]，[数据1]，[数据2]...]
+4    * @param {*} fileName 下载的文件名称
+5    * @param {*} titleName 表格标题
+6    * @param {*} type
+7    */
+    exports.downloadExl = function (_data, _fileName, _titleName, _type) {
+        let data = _data || [["姓名", "年龄"], ["小明", "12"]];
+        let fileName = _fileName || "下载";
+        let titleName = _titleName || "表格一";
+        let type = _type || "xlsx";
+        const self = this;
+        const range = data[0].length - 1;
+        const wopts = { bookType: type, bookSST: false, type: 'binary' };
+        const wb = { SheetNames: ['Sheet1'], Sheets: {}, Props: {} };
+        data = XLSX.utils.json_to_sheet(data);
+        data["A1"] = { t: "s", v: titleName }; //设置表格标题
+        data["!merges"] = [{//合并第一行数据[B1,C1,D1,E1]
+            s: {//s为开始
+                c: 0,//开始列
+                r: 0,//开始取值范围
+                alignment: { horizontal: "center", vertical: "center" }
+            },
+            e: {//e结束
+                c: range,//结束列
+                r: 0//结束范围
+
+            }
+        }];
+        wb.Sheets['Sheet1'] = data;
+        self.saveAs(new Blob([this.s2ab(XLSX.write(wb, wopts))], { type: "application/octet-stream" }), fileName + '.' + (wopts.bookType == "biff2" ? "xls" : wopts.bookType));
+    }
+
+
+    /**
+     * 导出列表方法   数据转换
+     * @param {*} s
+     */
+    exports.s2ab = function (s) {
+        if (typeof ArrayBuffer !== 'undefined') {
+            var buf = new ArrayBuffer(s.length);
+            var view = new Uint8Array(buf);
+            for (var i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+            return buf;
+        } else {
+            var buf = new Array(s.length);
+            for (var i = 0; i != s.length; ++i) buf[i] = s.charCodeAt(i) & 0xFF;
+            return buf;
+        }
+    }
+
+    /**
+    * 导出列表方法，下载文件
+    */
+    exports.saveAs = function (obj, fileName) {//当然可以自定义简单的下载文件实现方式
+        var tmpa = document.createElement("a");
+        tmpa.download = fileName || "下载";
+        tmpa.href = URL.createObjectURL(obj); //绑定a标签
+        tmpa.click(); //模拟点击实现下载
+        setTimeout(function () { //延时释放
+            URL.revokeObjectURL(obj); //用URL.revokeObjectURL()来释放这个object URL
+        }, 100);
+    };
+</script>
