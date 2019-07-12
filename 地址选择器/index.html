@@ -1,6 +1,7 @@
 ﻿<!DOCTYPE html>
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +13,7 @@
     <!-- body 最后 -->
     <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
     <script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.js"></script>
-
+    <script src="city-picker.js"></script>
     <style>
         body {
             height: 400px;
@@ -36,6 +37,7 @@
             }
     </style>
 </head>
+
 <body>
     <div>
         地址1：<input type="text" id='city-picker1' />
@@ -47,92 +49,23 @@
         地址3：<input type="text" id='city-picker3' />
     </div>
 </body>
+
 </html>
-<script src="city-picker.js"></script>
 <script>
-    
-    function makexzqh(resData) {
-        var newData = [];
-        var temp1 = [];
-        var temp2 = [];
-        //省级
-        for (var i = 0; i < resData.length; i++) {
-            if (resData[i].pcode == "") {
-                newData.push({ name: resData[i].name, code: resData[i].code, pcode: resData[i].pcode, sub: [] });
-            }
-        }
-        //市级
-        for (var i = 0; i < resData.length; i++) {
-            if (resData[i].pcode != "" && resData[i].pcode.substring(2) == "0000") {
-                temp1.push({ name: resData[i].name, code: resData[i].code, pcode: resData[i].pcode, sub: [] });
-            }
-        }
-        //县级
-        for (var i = 0; i < resData.length; i++) {
-            if (resData[i].pcode != "" && resData[i].pcode.substring(2) != "0000") {
-                temp2.push({ name: resData[i].name, code: resData[i].code, pcode: resData[i].pcode });
-            }
-        }
-
-        //将县级添加到市级
-        for (var i = 0; i < temp1.length; i++) {
-            for (var j = 0; j < temp2.length; j++) {
-                if (temp1[i].code == temp2[j].pcode) {
-                    temp1[i].sub.push(temp2[j]);
-                    temp2.splice(j, 1);
-                    j--;
-                }
-            }
-        }
-
-        //将市级添加到省级
-        for (var i = 0; i < newData.length; i++) {
-            for (var j = 0; j < temp1.length; j++) {
-                if (newData[i].code == temp1[j].pcode) {
-                    newData[i].sub.push(temp1[j]);
-                    temp1.splice(j, 1);
-                    j--;
-                }
-            }
-        }
-        //console.log(JSON.stringify(newData));
-        //console.log(temp1);
-        //console.log(temp2);
-        return newData;
-    }
-
-
-
-
     $(function () {
-        $.ajax({
-            url: "https://wjxapi.freexing.org/api/Wxb/get_xzqh_all",
-            type: "GET",
-            async: true,
-            success: function (res) {
-                var res = JSON.parse(res);
-                if (res.code == 200 && res.data.length > 0) {
-                    console.log(res.data);
-                    var data = makexzqh(res.data);
-                    //初始化地址选择器
-                    $("#city-picker1").cityPicker({
-                        title: "请选择收货地址",
-                        rawCitiesData: data
-                    });
-                    $("#city-picker2").cityPicker({
-                        title: "请选择收货地址",
-                        rawCitiesData: data
-                    });
-                    $("#city-picker3").cityPicker({
-                        title: "请选择收货地址",
-                        rawCitiesData: data
-                    });
-                }
-            },
-            error: function (e) { console.log(e) }
+        $("#city-picker1").val("北京 朝阳 ");
+        //初始化地址选择器
+        $.cityPickerReady({
+            elem:"#city-picker1",
+            title: "请选择收货地址"
         });
-
-
+        $.cityPickerReady({
+            elem:"#city-picker2",
+            title: "请选择收货地址"
+        });
+        $.cityPickerReady({
+            elem:"#city-picker3",
+            title: "请选择收货地址"
+        });
     });
-
 </script>

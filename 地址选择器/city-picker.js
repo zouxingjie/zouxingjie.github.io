@@ -1,12 +1,63 @@
 ﻿/* 修改为远程异步获取行政区划数据*/
 
-+function ($) {
++ function ($) {
     "use strict";
 
     var defaults;
-    //var raw = $.rawCitiesData2;
-    //var raw = newData;
     var raw = [];
+    $.cityPicker = {
+        isReady: false,  //行政区划数据状态
+        taskContainer: [] //任务容器
+    };
+
+    //构造行政区划数据结构
+    $.cityPicker.makexzqh = function (resData) {
+        var newData = [];
+        var temp1 = [];
+        var temp2 = [];
+        //省级
+        for (var i = 0; i < resData.length; i++) {
+            if (resData[i].pcode == "") {
+                newData.push({ name: resData[i].name, code: resData[i].code, pcode: resData[i].pcode, sub: [] });
+            }
+        }
+        //市级
+        for (var i = 0; i < resData.length; i++) {
+            if (resData[i].pcode != "" && resData[i].pcode.substring(2) == "0000") {
+                temp1.push({ name: resData[i].name, code: resData[i].code, pcode: resData[i].pcode, sub: [] });
+            }
+        }
+        //县级
+        for (var i = 0; i < resData.length; i++) {
+            if (resData[i].pcode != "" && resData[i].pcode.substring(2) != "0000") {
+                temp2.push({ name: resData[i].name, code: resData[i].code, pcode: resData[i].pcode });
+            }
+        }
+        //将县级添加到市级
+        for (var i = 0; i < temp1.length; i++) {
+            for (var j = 0; j < temp2.length; j++) {
+                if (temp1[i].code == temp2[j].pcode) {
+                    temp1[i].sub.push(temp2[j]);
+                    temp2.splice(j, 1);
+                    j--;
+                }
+            }
+        }
+        //将市级添加到省级
+        for (var i = 0; i < newData.length; i++) {
+            for (var j = 0; j < temp1.length; j++) {
+                if (newData[i].code == temp1[j].pcode) {
+                    newData[i].sub.push(temp1[j]);
+                    temp1.splice(j, 1);
+                    j--;
+                }
+            }
+        }
+        //console.log(JSON.stringify(newData));
+        //console.log(temp1);
+        //console.log(temp2);
+        return newData;
+    }
 
     var format = function (data) {
         var result = [];
@@ -61,7 +112,7 @@
         //}
 
         //允许第三列空值情况
-        if (tokens.length>1) {
+        if (tokens.length > 1) {
             c.sub.map(function (t) {
                 if (t.name === tokens[2]) d = t;
             })
@@ -73,10 +124,9 @@
 
     $.fn.cityPicker = function (params) {
         params = $.extend({}, defaults, params);
-        raw = params.rawCitiesData;
-        //判断第一行 是否有 3 列 ，没有则增加一列空值   (picker选择器 若为3列 则第一行必须为3列)
+        //判断第一行 是否有 3 列 ，没有则增加一列空值   (picker选择器 若要显示3列 则第一行必须为3列)
         if (!raw[0].sub[0].sub.length) {
-            raw[0].sub[0].sub.push({name:"",code:"",pcode:""});
+            raw[0].sub[0].sub.push({ name: "", code: "", pcode: "" });
         }
         return this.each(function () {
             var self = this;
@@ -227,9 +277,46 @@
             $(this).picker(p);
         });
     };
+    $.cityPickerReady = function (params) {
+        //先禁止input输入
+        if($(params.elem)){$(params.elem).attr("readonly",true)}
+        //判断选择器数据是否已准备完成
+        if ($.cityPicker.isReady) {
+            $(params.elem).cityPicker(params);
+        } else {
+            //数据未准备完成 先将任务加入任务列表
+            $.cityPicker.taskContainer.push(params);
+        }
+    }
 
     defaults = $.fn.cityPicker.prototype.defaults = {
         showDistrict: true //是否显示地区选择
     };
+
+    //异步获取数据
+    $.ajax({
+        url: "https://wjxapi.freexing.org/api/Wxb/get_xzqh_all",
+        type: "GET",
+        async: true,
+        success: function (res) {
+            var res = JSON.parse(res);
+            if (res.code == 200 && res.data.length > 0) {
+                console.log(res.data);
+                raw = $.cityPicker.makexzqh(res.data);
+                $.cityPicker.isReady = true;
+                //判断任务容器是否有任务
+                for (var i = 0; $.cityPicker.taskContainer.length; i++) {
+                    var elem = $.cityPicker.taskContainer[i].elem;
+                    if ($(elem)) {
+                        $(elem).cityPicker($.cityPicker.taskContainer[i]);
+                    }
+                    $.cityPicker.taskContainer.splice(i, 1);
+                    i--;
+                }
+
+            }
+        },
+        error: function (e) { console.log(e) }
+    });
 
 }($);
