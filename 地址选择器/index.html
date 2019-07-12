@@ -40,13 +40,13 @@
 
 <body>
     <div>
-        地址1：<input type="text" id='city-picker1' />
+        地址1：<input type="text" id='city-picker1' readonly/>
     </div>
     <div>
-        地址2：<input type="text" id='city-picker2' />
+        地址2：<input type="text" id='city-picker2' readonly/>
     </div>
     <div>
-        地址3：<input type="text" id='city-picker3' />
+        地址3：<input type="text" id='city-picker3' readonly/>
     </div>
 </body>
 
@@ -61,7 +61,8 @@
         });
         $.cityPickerReady({
             elem:"#city-picker2",
-            title: "请选择收货地址"
+            title: "请选择收货地址",
+            showDistrict: false
         });
         $.cityPickerReady({
             elem:"#city-picker3",

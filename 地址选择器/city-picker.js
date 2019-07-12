@@ -1,4 +1,6 @@
 ﻿/* 修改为远程异步获取行政区划数据*/
+/* author:了空*/
+/* date:20190712*/
 
 + function ($) {
     "use strict";
@@ -6,6 +8,7 @@
     var defaults;
     var raw = [];
     $.cityPicker = {
+        dataUrl: "https://wjxapi.freexing.org/api/Wxb/get_xzqh_all",  //数据接口地址
         isReady: false,  //行政区划数据状态
         taskContainer: [] //任务容器
     };
@@ -42,6 +45,8 @@
                     j--;
                 }
             }
+            //如果市级下属为空 则添加一个空对象 保证有3列数据
+            if(!temp1[i].sub.length){temp1[i].sub.push({ name: "", code: "", pcode: "" });}
         }
         //将市级添加到省级
         for (var i = 0; i < newData.length; i++) {
@@ -53,7 +58,7 @@
                 }
             }
         }
-        //console.log(JSON.stringify(newData));
+        // console.log(newData);
         //console.log(temp1);
         //console.log(temp2);
         return newData;
@@ -124,10 +129,6 @@
 
     $.fn.cityPicker = function (params) {
         params = $.extend({}, defaults, params);
-        //判断第一行 是否有 3 列 ，没有则增加一列空值   (picker选择器 若要显示3列 则第一行必须为3列)
-        if (!raw[0].sub[0].sub.length) {
-            raw[0].sub[0].sub.push({ name: "", code: "", pcode: "" });
-        }
         return this.each(function () {
             var self = this;
 
@@ -295,7 +296,7 @@
 
     //异步获取数据
     $.ajax({
-        url: "https://wjxapi.freexing.org/api/Wxb/get_xzqh_all",
+        url: $.cityPicker.dataUrl,
         type: "GET",
         async: true,
         success: function (res) {
