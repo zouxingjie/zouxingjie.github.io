@@ -46,7 +46,7 @@
                 }
             }
             //如果市级下属为空 则添加一个空对象 保证有3列数据
-            if(!temp1[i].sub.length){temp1[i].sub.push({ name: "", code: "", pcode: "" });}
+            if (!temp1[i].sub.length) { temp1[i].sub.push({ name: "", code: "", pcode: "" }); }
         }
         //将市级添加到省级
         for (var i = 0; i < newData.length; i++) {
@@ -109,19 +109,13 @@
         p.sub.map(function (t) {
             if (t.name === tokens[1]) c = t;
         })
+        if (!c) c = p.sub[0]; //如果没有匹配的 默认取第一项
+        if (tokens[1]=="") tokens[2] == ""; //如果第二列为空，则将第三列也设置为空
 
-        //if (tokens[2]) {
-        //    c.sub.map(function (t) {
-        //        if (t.name === tokens[2]) d = t;
-        //    })
-        //}
-
-        //允许第三列空值情况
-        if (tokens.length > 1) {
-            c.sub.map(function (t) {
-                if (t.name === tokens[2]) d = t;
-            })
-        }
+        c.sub.map(function (t) {
+            if (t.name === tokens[2]) d = t;
+        })
+        if (!d) d = c.sub[0]; //如果没有匹配的 默认取第一项
 
         if (d) return [p.code, c.code, d.code];
         return [p.code, c.code];
@@ -237,7 +231,7 @@
             var p = $.extend({}, params, config);
             //计算value
             var val = $(this).val();
-            if (!val) val = '北京 东城 ';
+            if (!val.split(" ")[0]) val = '北京 东城 ';
             currentProvince = val.split(" ")[0];
             currentCity = val.split(" ")[1];
             currentDistrict = val.split(" ")[2];
@@ -280,7 +274,7 @@
     };
     $.cityPickerReady = function (params) {
         //先禁止input输入
-        if($(params.elem)){$(params.elem).attr("readonly",true)}
+        if ($(params.elem)) { $(params.elem).attr("readonly", true) }
         //判断选择器数据是否已准备完成
         if ($.cityPicker.isReady) {
             $(params.elem).cityPicker(params);
