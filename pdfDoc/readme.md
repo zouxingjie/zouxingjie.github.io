@@ -8,3 +8,4 @@
 
 [MySQL_Json函数使用](https://zouxingjie.github.io/pdfDoc/MySQL_Json函数使用.pdf)  
 
+[mysql_udf_http的使用](https://zouxingjie.github.io/pdfDoc/mysql_udf_http使用教程.pdf) 
